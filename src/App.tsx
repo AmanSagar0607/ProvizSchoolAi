@@ -9,7 +9,6 @@ import './index.css';
 import About from './About';
 import Programs from './Programs';
 
-// Create the router using React Router v7's createBrowserRouter
 const router = createBrowserRouter(
   [
     {
@@ -22,11 +21,11 @@ const router = createBrowserRouter(
     },
     {
       path: '/about',
-      element: <About/>,
+      element: <About />,
     },
     {
       path: '/programs',
-      element: <Programs/>,
+      element: <Programs />,
     },
     {
       path: '/admin',
@@ -43,12 +42,13 @@ const router = createBrowserRouter(
   ],
   {
     future: {
-v7_startTransition: true,
-    v7_fetcherPersist: true,
-    v7_normalizeFormMethod: true,
-    v7_partialHydration: true,
-    v7_skipActionErrorRevalidation: true
-    }
+  v7_startTransition: true,
+  v7_fetcherPersist: true,
+  v7_normalizeFormMethod: true,
+  v7_partialHydration: true,
+  v7_skipActionErrorRevalidation: true,
+  v7_relativeSplatPath: true,
+},
   }
 );
 

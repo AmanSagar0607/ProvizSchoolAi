@@ -52,7 +52,7 @@ interface Application {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [applications, setApplications] = useState<Application[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // Declare searchTerm here
   const [loading, setLoading] = useState(true);
 
   const fetchApplications = useCallback(async () => {
@@ -85,34 +85,34 @@ const AdminDashboard = () => {
     fetchApplications();
   }, [fetchApplications]);
 
-  const fetchApplications = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      navigate('/admin');
-      return;
-    }
+  // const fetchApplications = async () => {
+  //   const token = localStorage.getItem('adminToken');
+  //   if (!token) {
+  //     navigate('/admin');
+  //     return;
+  //   }
 
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/applications/applications`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(`${API_BASE_URL}/api/applications/applications`, {
+  //       headers: {
+  //         'Authorization': `Bearer ${token}`,
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch applications');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch applications');
+  //     }
 
-      const data = await response.json();
-      setApplications(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await response.json();
+  //     setApplications(Array.isArray(data) ? data : []);
+  //   } catch (error) {
+  //     console.error('Error fetching applications:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleDelete = async (id: string) => {
     try {
