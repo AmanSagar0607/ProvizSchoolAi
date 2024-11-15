@@ -8,6 +8,7 @@
 
 {
   "compilerOptions": {
+    "jsx": "react-jsx", // For React 17+ with JSX transform
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
