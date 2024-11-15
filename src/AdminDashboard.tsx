@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import {
   Table,
   TableBody,
@@ -9,265 +7,212 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  LogOut, 
-  Search, 
-  Trash2, 
-  Download, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import {
+  Search,
+  Trash2,
+  Mail,
+  Phone,
+  Calendar,
+  MoreVertical,
+  Download,
   RefreshCw,
-  Filter
-} from 'lucide-react';
-import type { Application } from '../types/admin';
-import { API_BASE_URL } from './config/api';
+} from 'lucide-react';import { API_BASE_URL } from '@/config/api';
 
-const AdminDashboard: React.FC = () => {
+interface Application {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  statement: string;
+  createdAt: string;
+}
+
+const AdminDashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
-  const [filteredApplications, setFilteredApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const navigate = useNavigate();
-
-  const fetchApplications = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      navigate('/admin');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/admin/applications`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch applications');
-      
-      const data = await response.json();
-      setApplications(data);
-      setFilteredApplications(data);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      setError('Failed to fetch applications. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-// Move fetchApplications inside useEffect to avoid dependency issues
-useEffect(() => {
-  const fetchApplications = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      navigate('/admin');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/admin/applications`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch applications');
-      
-      const data = await response.json();
-      setApplications(data);
-      setFilteredApplications(data);
-    } catch (error) {
-      console.error('Error fetching applications:', error);
-      setError('Failed to fetch applications. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchApplications();
-}, [navigate]);
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const filtered = applications.filter(app => 
-      app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.phone.includes(searchTerm)
-    );
-    setFilteredApplications(filtered);
-  }, [searchTerm, applications]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    navigate('/admin');
-  };
-
-  const handleRefresh = () => {
-    setLoading(true);
     fetchApplications();
-  };
-  
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this application?')) return;
+  }, []);
 
+  const fetchApplications = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const response = await fetch(`${API_BASE_URL}/api/applications/applications`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      });
+      const data = await response.json();
+      setApplications(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
       const response = await fetch(`${API_BASE_URL}/api/admin/applications/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
       });
 
-      if (!response.ok) throw new Error('Failed to delete application');
-      
-      setApplications(applications.filter(app => app._id !== id));
+      if (response.ok) {
+        setApplications(applications.filter(app => app._id !== id));
+      }
     } catch (error) {
       console.error('Error deleting application:', error);
-      setError('Failed to delete application. Please try again later.');
     }
   };
 
-  const exportToCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Statement', 'Date'];
-    const csvContent = [
-      headers.join(','),
-      ...filteredApplications.map(app => [
-        app.name,
-        app.email,
-        app.phone,
-        `"${app.statement.replace(/"/g, '""')}"`,
-        new Date(app.createdAt).toLocaleDateString()
-      ].join(','))
-    ].join('\n');
+  const filteredApplications = applications.filter(application =>
+    application.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    application.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `applications_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-7xl mb-16">
-        <div className="flex flex-col gap-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <Button onClick={handleLogout} variant="outline">
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-  
-          <Card className="mx-auto w-full shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle>Applications Management</CardTitle>
+      <div className="container mx-auto px-4 py-6">
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="text-2xl">Applications Dashboard</CardTitle>
+                <CardDescription>Manage and review all student applications</CardDescription>
+              </div>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={handleRefresh}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
+                <Button variant="outline" onClick={fetchApplications}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </Button>
-                <Button variant="outline" onClick={exportToCSV}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export CSV
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {error && (
-                <div className="bg-destructive/10 text-destructive px-4 py-2 rounded-md mb-4">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex items-center gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search applications..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
                 <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
                 </Button>
               </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center mb-6">
+              <div className="relative w-72">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search applications..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Badge variant="secondary">
+                Total Applications: {applications.length}
+              </Badge>
+            </div>
 
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <RefreshCw className="h-6 w-6 animate-spin" />
-                </div>
-              ) : (
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Personal Statement</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredApplications.length > 0 ? (
-                        filteredApplications.map((app) => (
-                          <TableRow key={app._id}>
-                            <TableCell className="font-medium">{app.name}</TableCell>
-                            <TableCell>{app.email}</TableCell>
-                            <TableCell>{app.phone}</TableCell>
-                            <TableCell className="max-w-xs truncate">{app.statement}</TableCell>
-                            <TableCell>{new Date(app.createdAt).toLocaleDateString()}</TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                onClick={() => handleDelete(app._id)}
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center py-8">
-                            No applications found
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Statement</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredApplications.map((application) => (
+                    <TableRow key={application._id}>
+                      <TableCell className="font-medium">{application.name}</TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">{application.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">{application.phone}</span>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        <p className="truncate text-sm text-muted-foreground">
+                          {application.statement}
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{formatDate(application.createdAt)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDelete(application._id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
 
-      <Footer />
+            {!loading && filteredApplications.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No applications found</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
