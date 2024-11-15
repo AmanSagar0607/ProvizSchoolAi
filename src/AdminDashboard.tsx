@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import {
   Table,
@@ -33,7 +34,9 @@ import {
   MoreVertical,
   Download,
   RefreshCw,
-} from 'lucide-react';import { API_BASE_URL } from '@/config/api';
+  LogOut,
+} from 'lucide-react';
+import { API_BASE_URL } from '@/config/api';
 
 interface Application {
   _id: string;
@@ -45,6 +48,7 @@ interface Application {
 }
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [applications, setApplications] = useState<Application[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -99,101 +103,140 @@ const AdminDashboard = () => {
     });
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    navigate('/admin');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <div className="container mx-auto px-4 py-6">
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex justify-between items-center">
+      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <Card>
+            <CardHeader className="p-4">
+              <CardTitle className="text-sm sm:text-base">Total Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl sm:text-3xl font-bold">{applications.length}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4">
+              <CardTitle className="text-sm sm:text-base">Recent Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl sm:text-3xl font-bold">
+                {applications.filter(app => 
+                  new Date(app.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                ).length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Last 7 days</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="p-4">
+              <CardTitle className="text-sm sm:text-base">Search Results</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl sm:text-3xl font-bold">{filteredApplications.length}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Matching applications</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader className="p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <CardTitle className="text-2xl">Applications Dashboard</CardTitle>
-                <CardDescription>Manage and review all student applications</CardDescription>
+                <CardTitle className="text-lg sm:text-2xl">Applications Dashboard</CardTitle>
+                <CardDescription className="text-sm">Manage and review all student applications</CardDescription>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={fetchApplications}>
-                  <RefreshCw className="h-4 w-4 mr-2" />
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                <Button variant="outline" size="sm" onClick={fetchApplications} className="text-xs sm:text-sm">
+                  <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Refresh
                 </Button>
-                <Button variant="outline">
-                  <Download className="h-4 w-4 mr-2" />
+                <Button variant="outline" size="sm" className="text-xs sm:text-sm">
+                  <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Export
+                </Button>
+                <Button variant="destructive" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
+                  <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  Logout
                 </Button>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center mb-6">
-              <div className="relative w-72">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
                 <Input
                   placeholder="Search applications..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-8 sm:pl-10 text-sm h-8 sm:h-10"
                 />
               </div>
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="text-xs sm:text-sm">
                 Total Applications: {applications.length}
               </Badge>
             </div>
 
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <RefreshCw className="h-6 w-6 animate-spin" />
-              </div>
-            ) : (
+            <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Statement</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Name</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Contact</TableHead>
+                    <TableHead className="text-xs sm:text-sm hidden md:table-cell">Statement</TableHead>
+                    <TableHead className="text-xs sm:text-sm">Date</TableHead>
+                    <TableHead className="text-xs sm:text-sm text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredApplications.map((application) => (
                     <TableRow key={application._id}>
-                      <TableCell className="font-medium">{application.name}</TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{application.email}</span>
+                      <TableCell className="text-xs sm:text-sm font-medium">{application.name}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
+                        <div className="space-y-0.5 sm:space-y-1">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                            <span>{application.email}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{application.phone}</span>
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                            <span>{application.phone}</span>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="truncate text-sm text-muted-foreground">
+                      <TableCell className="max-w-xs hidden md:table-cell">
+                        <p className="truncate text-xs sm:text-sm text-muted-foreground">
                           {application.statement}
                         </p>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{formatDate(application.createdAt)}</span>
+                      <TableCell className="text-xs sm:text-sm">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                          <span>{formatDate(application.createdAt)}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
+                            <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-8 sm:w-8">
+                              <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="text-xs sm:text-sm">
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => handleDelete(application._id)}
                             >
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                               Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -203,13 +246,7 @@ const AdminDashboard = () => {
                   ))}
                 </TableBody>
               </Table>
-            )}
-
-            {!loading && filteredApplications.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">No applications found</p>
-              </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>
