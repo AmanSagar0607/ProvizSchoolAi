@@ -54,16 +54,36 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      navigate('/admin');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     fetchApplications();
   }, []);
 
   const fetchApplications = async () => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      navigate('/admin');
+      return;
+    }
+
     try {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}/api/applications/applications`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch applications');
+      }
+
       const data = await response.json();
       setApplications(Array.isArray(data) ? data : []);
     } catch (error) {
