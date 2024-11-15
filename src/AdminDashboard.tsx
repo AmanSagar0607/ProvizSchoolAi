@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import {
@@ -53,16 +55,35 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchApplications = useCallback(async () => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       navigate('/admin');
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/applications/applications`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch applications');
+      }
+      const data = await response.json();
+      setApplications(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+    } finally {
+      setLoading(false);
     }
   }, [navigate]);
 
   useEffect(() => {
     fetchApplications();
-  }, []);
+  }, [fetchApplications]);
 
   const fetchApplications = async () => {
     const token = localStorage.getItem('adminToken');
