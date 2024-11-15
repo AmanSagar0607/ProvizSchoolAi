@@ -86,7 +86,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold text-gray-600 mb-6">Admin Dashboard</h1> {/* Header for Admin Dashboard */}
+      <h2 className="text-3xl font-bold text-gray-600 mb-6">Admin Dashboard</h2> {/* Header for Admin Dashboard */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Applications</CardTitle>
