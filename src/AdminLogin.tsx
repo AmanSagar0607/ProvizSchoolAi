@@ -122,22 +122,14 @@ const AdminLogin: React.FC = () => {
                 </Button>
               </form>
 
-              <div className="mt-6 flex items-center justify-center gap-4">
-                <Button
-                  variant="link"
+              <div className="mt-6 text-center">
+                <Button 
+                  variant="link" 
                   className="text-primary text-base"
                   onClick={() => navigate('/')}
                 >
                   Return to Homepage
                 </Button>
-                <Button
-  variant="outline"
-  className="text-base"
-  onClick={() => navigate('/signup')}
->
-  Create Account
-</Button>
-
               </div>
             </CardContent>
           </Card>

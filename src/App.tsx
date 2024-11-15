@@ -1,7 +1,6 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AdminLogin from './AdminLogin';
-import AdminSignup from './AdminSignup';  // Add this import
 import AdminDashboard from './AdminDashboard';
 import Contact from './Contact';
 import LandingPage from './LandingPage';
@@ -10,6 +9,7 @@ import './index.css';
 import About from './About';
 import Programs from './Programs';
 
+// Create the router using React Router v7's createBrowserRouter
 const router = createBrowserRouter(
   [
     {
@@ -33,10 +33,6 @@ const router = createBrowserRouter(
       element: <AdminLogin />,
     },
     {
-      path: '/signup',
-      element: <AdminSignup />,
-    },
-    {
       path: '/admin/dashboard',
       element: <AdminDashboard />,
     },
@@ -47,11 +43,11 @@ const router = createBrowserRouter(
   ],
   {
     future: {
-      v7_startTransition: true,
-      v7_fetcherPersist: true,
-      v7_normalizeFormMethod: true,
-      v7_partialHydration: true,
-      v7_skipActionErrorRevalidation: true
+v7_startTransition: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true
     }
   }
 );
