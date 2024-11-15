@@ -9,5 +9,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // Remove the proxy configuration since we're using a deployed backend
+  server: {
+    proxy: {
+      '/api': 'https://proviz-backend-service-api.vercel.app',  // Proxy API requests to your backend server
+    },
+  },
 })
