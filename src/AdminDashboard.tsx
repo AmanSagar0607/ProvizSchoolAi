@@ -27,7 +27,7 @@ const AdminDashboard: React.FC = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/admin/applications', {
+        const response = await fetch('https://proviz-backend-service-api.vercel.app/api/admin/applications', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -56,7 +56,7 @@ const AdminDashboard: React.FC = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/applications/${id}`, {
+      const response = await fetch(`https://proviz-backend-service-api.vercel.app/api/admin/applications/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

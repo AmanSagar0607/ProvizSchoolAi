@@ -9,9 +9,5 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '/api': 'http://localhost:5000',  // Proxy API requests to your backend server
-    },
-  },
+  // Remove the proxy configuration since we're using a deployed backend
 })
