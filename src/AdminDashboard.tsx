@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Application } from '../types/admin';
+import { API_BASE_URL } from './config/api';
 
 const AdminDashboard: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -27,13 +28,18 @@ const AdminDashboard: React.FC = () => {
       }
 
       try {
-        const response = await fetch('https://proviz-backend-service-api.vercel.app/api/admin/applications', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetch(`${API_BASE_URL}/api/admin/applications`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'  // Important for CORS
         });
         
         if (!response.ok) throw new Error('Failed to fetch applications');
         
-        const data: Application[] = await response.json();
+        const data = await response.json();
         setApplications(data);
       } catch (error) {
         console.error('Error fetching applications:', error);
@@ -56,9 +62,13 @@ const AdminDashboard: React.FC = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`https://proviz-backend-service-api.vercel.app/api/admin/applications/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/applications/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
       });
 
       if (!response.ok) throw new Error('Failed to delete application');

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { useNavigate } from 'react-router-dom'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { API_BASE_URL } from './config/api';
 import { Textarea } from "@/components/ui/textarea"
 import {
   Dialog,
@@ -40,28 +41,30 @@ export default function LandingPage() {
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const response = await fetch('https://proviz-backend-service-api.vercel.app/api/applications', {
+      const response = await fetch(`${API_BASE_URL}/api/applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
-      })
+      });
+      
       if (response.ok) {
-        setIsOpen(false)
-        setFormData({ name: '', email: '', phone: '', statement: '' })
-        alert('Application submitted successfully!')
+        setIsOpen(false);
+        setFormData({ name: '', email: '', phone: '', statement: '' });
+        alert('Application submitted successfully!');
       } else {
-        const errorData = await response.json()
-        alert(`Failed to submit application: ${errorData.message || 'An unknown error occurred.'}`)
+        const errorData = await response.json();
+        alert(`Failed to submit application: ${errorData.message || 'An unknown error occurred.'}`);
       }
     } catch (error) {
-      console.error('Error:', error)
-      alert('Failed to submit application. Please try again later.')
+      console.error('Error:', error);
+      alert('Failed to submit application. Please try again later.');
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
