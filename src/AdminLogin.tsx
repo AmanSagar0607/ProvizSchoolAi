@@ -1,18 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Brain, Menu } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  // SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import type { LoginCredentials, LoginResponse } from "../types/admin";
 
 const AdminLogin: React.FC = () => {
@@ -21,6 +15,7 @@ const AdminLogin: React.FC = () => {
     password: "",
   });
   const [error, setError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(true);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,10 +26,7 @@ const AdminLogin: React.FC = () => {
       return;
     }
 
-    if (
-      credentials.username === "admin" &&
-      credentials.password === "admin123"
-    ) {
+    if (credentials.username === "admin" && credentials.password === "admin123") {
       try {
         const data: LoginResponse = {
           token: "your-generated-token-here",
@@ -60,81 +52,99 @@ const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground ">
-      <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Brain className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Proviz School of AI</span>
-            </div>
-            <div className="hidden md:flex space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/')}>Home</Button>
-              <Button variant="ghost" onClick={() => navigate('/programs')}>Programs</Button>
-              <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
-              <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
-              <Button variant="ghost" onClick={() => navigate('/admin/dashboard')}>Admin</Button>
-            </div>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="md:hidden">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                  {/* <SheetDescription>
-                    Navigate through our site
-                  </SheetDescription> */}
-                </SheetHeader>
-                <div className="mt-4 space-y-2">
-                  <Button variant="ghost" onClick={() => navigate('/')} className="w-full justify-start">Home</Button>
-                  <Button variant="ghost" onClick={() => navigate('/programs')} className="w-full justify-start">Programs</Button>
-                  <Button variant="ghost" onClick={() => navigate('/about')} className="w-full justify-start">About</Button>
-                  <Button variant="ghost" onClick={() => navigate('/contact')} className="w-full justify-start">Contact</Button>
-                  <Button variant="ghost" onClick={() => navigate('/admin/dashboard')} className="w-full justify-start">Admin</Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <Header />
 
-      <div className="flex items-center justify-center  p-4 mt-24">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Admin Login</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              {error && <p className="text-red-500 text-sm">{error}</p>}
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  value={credentials.username}
-                  onChange={(e) => handleChange(e, "username")}
-                  required
-                />
+      <main className="flex-1 flex items-center justify-center p-4 my-8 sm:my-12 md:my-16">
+        <div className="w-full max-w-md mx-4">
+          <Card className="border-2 shadow-lg">
+            <CardHeader className="space-y-1 pb-8">
+              <CardTitle className="text-2xl md:text-3xl text-center font-bold">
+                Admin Login
+              </CardTitle>
+              <p className="text-center text-muted-foreground">
+                Enter your credentials to access the admin dashboard
+              </p>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleLogin} className="space-y-6">
+                {error && (
+                  <div className="p-3 text-sm bg-destructive/10 border border-destructive/20 text-destructive rounded-md">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-base">Username</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="username"
+                      placeholder="Enter your username"
+                      className="pl-10 h-12 text-base"
+                      value={credentials.username}
+                      onChange={(e) => handleChange(e, "username")}
+                      required
+                    />
+                  </div>
+                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-base">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        className="pl-10 pr-10 h-12 text-base"
+                        value={credentials.password}
+                        onChange={(e) => handleChange(e, "password")}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-1 top-1 h-10 w-10 p-0"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                <Button type="submit" className="w-full h-12 text-base">
+                  Login to Dashboard
+                </Button>
+              </form>
+
+              <div className="mt-6 flex items-center justify-center gap-4">
+                <Button
+                  variant="link"
+                  className="text-primary text-base"
+                  onClick={() => navigate('/')}
+                >
+                  Return to Homepage
+                </Button>
+                <Button
+  variant="outline"
+  className="text-base"
+  onClick={() => navigate('/signup')}
+>
+  Create Account
+</Button>
+
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={credentials.password}
-                  onChange={(e) => handleChange(e, "password")}
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 };

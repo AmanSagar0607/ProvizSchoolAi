@@ -1,72 +1,103 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Brain, Menu } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  // SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, BookOpen, BriefcaseIcon, Newspaper } from 'lucide-react';
 
 const About = () => {
   const navigate = useNavigate();
 
+  const sections = [
+    {
+      title: "Our Story",
+      icon: <BookOpen className="h-6 w-6 text-primary" />,
+      content: "Founded in 2020, Proviz School of AI has grown from a small startup to a leading institution in AI education. Our journey is marked by continuous innovation and a commitment to excellence in teaching artificial intelligence.",
+      link: "/about/story"
+    },
+    {
+      title: "Become a Mentor",
+      icon: <Users className="h-6 w-6 text-primary" />,
+      content: "Share your expertise and help shape the next generation of AI professionals. Join our network of industry experts and make a real impact on students' careers.",
+      link: "/about/mentor"
+    },
+    {
+      title: "Join Our Team",
+      icon: <BriefcaseIcon className="h-6 w-6 text-primary" />,
+      content: "We're always looking for talented individuals who share our passion for AI education. Explore career opportunities at Proviz School of AI.",
+      link: "/careers"
+    },
+    {
+      title: "Press Inquiries",
+      icon: <Newspaper className="h-6 w-6 text-primary" />,
+      content: "For media inquiries and press information, please contact our communications team at press@proviz.ai",
+      link: "/press"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Brain className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">Proviz School of AI</span>
-            </div>
-            <div className="hidden md:flex space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/')}>Home</Button>
-              <Button variant="ghost" onClick={() => navigate('/programs')}>Programs</Button>
-              <Button variant="ghost" onClick={() => navigate('/about')}>About</Button>
-              <Button variant="ghost" onClick={() => navigate('/contact')}>Contact</Button>
-              <Button variant="ghost" onClick={() => navigate('/admin/dashboard')}>Admin</Button>
-            </div>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="md:hidden">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Menu</SheetTitle>
-                  {/* <SheetDescription>
-                    Navigate through our site
-                  </SheetDescription> */}
-                </SheetHeader>
-                <div className="mt-4 space-y-2">
-                  <Button variant="ghost" onClick={() => navigate('/')} className="w-full justify-start">Home</Button>
-                  <Button variant="ghost" onClick={() => navigate('/programs')} className="w-full justify-start">Programs</Button>
-                  <Button variant="ghost" onClick={() => navigate('/about')} className="w-full justify-start">About</Button>
-                  <Button variant="ghost" onClick={() => navigate('/contact')} className="w-full justify-start">Contact</Button>
-                  <Button variant="ghost" onClick={() => navigate('/admin/dashboard')} className="w-full justify-start">Admin</Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
-      <main className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-semibold">About Proviz School of AI</h2>
-        <p className="text-xl my-4">We are an innovative AI institute focused on nurturing talent and advancing the AI landscape.</p>
-        <p className="mt-4 text-lg">
-          Our mission is to provide world-class education to students and professionals interested in AI, machine learning, and data science. 
-          We believe in a hands-on approach, ensuring that our students are well-prepared for the real world.
-        </p>
-        <div className="mt-8">
-          <Button variant="default" onClick={() => navigate('/programs')}>Explore Programs</Button>
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">About Us</h1>
+          <p className="text-xl text-center text-muted-foreground mb-12">
+            Empowering the next generation of AI innovators through world-class education and mentorship.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+            {sections.map((section, index) => (
+              <Card key={index} className="hover:shadow-lg transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      {section.icon}
+                    </div>
+                    <CardTitle className="text-xl">{section.title}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-4">{section.content}</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate(section.link)}
+                    className="w-full"
+                  >
+                    Learn More
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="bg-muted/30 rounded-2xl p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Ready to Start Your AI Journey?</h2>
+            <p className="text-lg text-muted-foreground mb-6">
+              Join our community of learners and industry experts. Transform your career with cutting-edge AI education.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button 
+                variant="default"
+                size="lg"
+                onClick={() => navigate('/programs')}
+              >
+                Explore Programs
+              </Button>
+              <Button 
+                variant="outline"
+                size="lg"
+                onClick={() => navigate('/contact')}
+              >
+                Contact Us
+              </Button>
+            </div>
+          </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 };
